@@ -1,0 +1,48 @@
+#!/bin/sh
+
+indent() {
+  sed -u 's/^/       /'
+}
+
+curl_opts=(curl --connect-timeout 15 --retry 3 --retry-delay 5 --silent --location --insecure --fail)
+
+clean_html_index() {
+    local url="$1"
+    local filter="${2:-(?<=href=\")[^\"]+\.(tar\.(gz|bz2|xz)|7z|zip)}"
+    "${curl_opts[@]}" -l "$url" | grep -ioP "$filter" | sort -uV
+}
+
+get_last_version() {
+    local filelist="$1"
+    local filter="$2"
+    local version="$3"
+    local ret
+    ret="$(echo "$filelist" | grep -E "$filter" | sort -V | tail -1)"
+    [[ -n "$version" ]] && ret="$(echo "$ret" | grep -oP "$version")"
+    echo "$ret"
+}
+
+echo "-----> Install aria2c"
+BUILD_DIR=$1
+VENDOR_DIR="vendor"
+ARIA2_V="$(clean_html_index https://github.com/q3aql/aria2-static-builds/releases 'aria2-[0-9]+\.[0-9]+\.[0-9]+')"
+ARIA2_V="$(get_last_version "${ARIA2_V}" aria2 '\d+\.\d+\.\d+')"
+FILE="aria2-$ARIA2_V-linux-gnu-64bit-build1"
+DOWNLOAD_URL="https://github.com/q3aql/aria2-static-builds/releases/download/v$ARIA2_V/$FILE.tar.bz2"
+
+echo "DOWNLOAD_URL = " $DOWNLOAD_URL | indent
+
+cd $BUILD_DIR
+mkdir -p $VENDOR_DIR
+cd $VENDOR_DIR
+mkdir -p aria2c
+cd aria2c
+wget -q $DOWNLOAD_URL
+tar jxf $FILE.tar.bz2
+mv $FILE/* .
+rm -rf $FILE $FILE.tar.bz2
+
+echo "exporting PATH" | indent
+PROFILE_PATH="$BUILD_DIR/.profile.d/aria2c.sh"
+mkdir -p $(dirname $PROFILE_PATH)
+echo 'export PATH="$PATH:${HOME}/vendor/aria2c"' >> $PROFILE_PATH
