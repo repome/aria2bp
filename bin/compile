@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 indent() {
   sed -u 's/^/       /'
@@ -30,19 +30,19 @@ ARIA2_V="$(get_last_version "${ARIA2_V}" aria2 '\d+\.\d+\.\d+')"
 FILE="aria2-$ARIA2_V-linux-gnu-64bit-build1"
 DOWNLOAD_URL="https://github.com/q3aql/aria2-static-builds/releases/download/v$ARIA2_V/$FILE.tar.bz2"
 
-echo "DOWNLOAD_URL = " $DOWNLOAD_URL | indent
+echo "DOWNLOAD_URL = " "$DOWNLOAD_URL" | indent
 
-cd $BUILD_DIR
-mkdir -p $VENDOR_DIR
-cd $VENDOR_DIR
+cd "$BUILD_DIR" || exit
+mkdir -p "$VENDOR_DIR"
+cd $VENDOR_DIR || exit
 mkdir -p aria2c
-cd aria2c
-wget -q $DOWNLOAD_URL
-tar jxf $FILE.tar.bz2
-mv $FILE/* .
-rm -rf $FILE $FILE.tar.bz2
+cd aria2c || exit
+wget -q "$DOWNLOAD_URL"
+tar jxf "$FILE".tar.bz2
+mv "$FILE"/* .
+rm -rf "$FILE" "$FILE".tar.bz2
 
 echo "exporting PATH" | indent
 PROFILE_PATH="$BUILD_DIR/.profile.d/aria2c.sh"
-mkdir -p $(dirname $PROFILE_PATH)
-echo 'export PATH="$PATH:${HOME}/vendor/aria2c"' >> $PROFILE_PATH
+mkdir -p "$(dirname "$PROFILE_PATH")"
+echo "export PATH=""$PATH":"$HOME"/vendor/aria2c"" >> "$PROFILE_PATH"
