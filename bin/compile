@@ -26,9 +26,11 @@ echo "-----> Install aria2c"
 BUILD_DIR=$1
 VENDOR_DIR="vendor"
 ARIA2_V="$(clean_html_index https://github.com/q3aql/aria2-static-builds/releases 'aria2-[0-9]+\.[0-9]+\.[0-9]+')"
-ARIA2_V="$(get_last_version "${ARIA2_V}" aria2 '\d+\.\d+\.\d+')"
-FILE="aria2-$ARIA2_V-linux-gnu-64bit-build1"
-DOWNLOAD_URL="https://github.com/q3aql/aria2-static-builds/releases/download/v$ARIA2_V/$FILE.tar.bz2"
+echo "$ARIA2_V"
+ARIA2_VX="$(get_last_version "${ARIA2_V}" aria2 '\d+\.\d+\.\d+')"
+echo "$ARIA2_VX"
+FILE="aria2-$ARIA2_VX-linux-gnu-64bit-build1"
+DOWNLOAD_URL="https://github.com/q3aql/aria2-static-builds/releases/download/v$ARIA2_VX/$FILE.tar.bz2"
 
 echo "DOWNLOAD_URL = " "$DOWNLOAD_URL" | indent
 
